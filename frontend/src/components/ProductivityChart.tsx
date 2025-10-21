@@ -26,6 +26,7 @@ const ProductivityChart: React.FC = () => {
 
   useEffect(() => {
     console.log('ProductivityChart: tasks received:', tasks.length);
+    console.log('Tasks data:', tasks);
     
     // Calculate productivity data for the last 7 days
     const getLast7Days = () => {
@@ -51,6 +52,8 @@ const ProductivityChart: React.FC = () => {
     });
 
     console.log('Completed tasks by day:', completedTasksByDay);
+    console.log('Total completed tasks:', tasks.filter(t => t.status === 'completed').length);
+    console.log('Tasks with completedAt:', tasks.filter(t => t.completedAt).length);
 
     const chartDataConfig = {
       labels: last7Days.map(day => new Date(day).toLocaleDateString()),
@@ -109,6 +112,11 @@ const ProductivityChart: React.FC = () => {
           <div className="text-6xl mb-4">📊</div>
           <p className="text-lg font-medium">No completed tasks yet</p>
           <p className="text-sm">Complete some tasks to see your productivity trends</p>
+          <div className="mt-4 text-xs text-gray-400">
+            <p>Total tasks: {tasks.length}</p>
+            <p>Completed tasks: {tasks.filter(t => t.status === 'completed').length}</p>
+            <p>Tasks with completion date: {tasks.filter(t => t.completedAt).length}</p>
+          </div>
         </div>
       )}
     </div>

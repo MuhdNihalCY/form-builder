@@ -4,7 +4,6 @@ import { fetchTaskStats, fetchTasks } from '../store/slices/taskSlice';
 import TaskStats from '../components/TaskStats';
 import ProductivityChart from '../components/ProductivityChart';
 import RecentTasks from '../components/RecentTasks';
-import TestChart from '../components/TestChart';
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -38,10 +37,6 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProductivityChart />
         <RecentTasks tasks={tasks} />
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TestChart />
       </div>
     </div>
   );
