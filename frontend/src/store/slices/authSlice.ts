@@ -13,7 +13,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   token: localStorage.getItem('token'),
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
   error: null,
 };
@@ -75,6 +75,17 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
     },
+    restoreAuth: (state) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        state.token = token;
+        state.isAuthenticated = true;
+      } else {
+        state.token = null;
+        state.isAuthenticated = false;
+        state.user = null;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -126,5 +137,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, setCredentials } = authSlice.actions;
+export const { logout, clearError, setCredentials, restoreAuth } = authSlice.actions;
 export default authSlice.reducer;

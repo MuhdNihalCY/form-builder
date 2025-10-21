@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppDispatch, useAppSelector } from './hooks/redux';
-import { getProfile } from './store/slices/authSlice';
+import { getProfile, restoreAuth } from './store/slices/authSlice';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -13,13 +13,28 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function AppContent() {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, token } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, token, user, loading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token && !isAuthenticated) {
+    // Restore authentication state from localStorage on app initialization
+    dispatch(restoreAuth());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // If we have a token but no user data, fetch the profile
+    if (token && isAuthenticated && !user && !loading) {
       dispatch(getProfile());
     }
-  }, [dispatch, token, isAuthenticated]);
+  }, [dispatch, token, isAuthenticated, user, loading]);
+
+  // Show loading spinner while checking authentication
+  if (loading && token) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <Router>

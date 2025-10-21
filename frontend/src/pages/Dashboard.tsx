@@ -3,10 +3,12 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchTaskStats, fetchTasks } from '../store/slices/taskSlice';
 import TaskStats from '../components/TaskStats';
 import ProductivityChart from '../components/ProductivityChart';
+import RecentTasks from '../components/RecentTasks';
+import TestChart from '../components/TestChart';
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { stats, loading } = useAppSelector((state) => state.tasks);
+  const { stats, loading, tasks } = useAppSelector((state) => state.tasks);
 
   useEffect(() => {
     // Fetch both stats and tasks for the dashboard
@@ -35,6 +37,11 @@ const Dashboard: React.FC = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProductivityChart />
+        <RecentTasks tasks={tasks} />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TestChart />
       </div>
     </div>
   );

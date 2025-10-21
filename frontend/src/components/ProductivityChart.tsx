@@ -25,52 +25,56 @@ const ProductivityChart: React.FC = () => {
   const [chartData, setChartData] = useState<any>(null);
 
   useEffect(() => {
-    if (tasks.length > 0) {
-      // Calculate productivity data for the last 7 days
-      const getLast7Days = () => {
-        const days = [];
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          days.push(date.toISOString().split('T')[0]);
-        }
-        return days;
-      };
+    console.log('ProductivityChart: tasks received:', tasks.length);
+    
+    // Calculate productivity data for the last 7 days
+    const getLast7Days = () => {
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        days.push(date.toISOString().split('T')[0]);
+      }
+      return days;
+    };
 
-      const last7Days = getLast7Days();
-      
-      const completedTasksByDay = last7Days.map(day => {
-        return tasks.filter(task => 
-          task.status === 'completed' && 
-          task.completedAt && 
-          task.completedAt.split('T')[0] === day
-        ).length;
-      });
+    const last7Days = getLast7Days();
+    
+    const completedTasksByDay = last7Days.map(day => {
+      const dayTasks = tasks.filter(task => 
+        task.status === 'completed' && 
+        task.completedAt && 
+        task.completedAt.split('T')[0] === day
+      );
+      console.log(`Day ${day}: ${dayTasks.length} completed tasks`);
+      return dayTasks.length;
+    });
 
-      setChartData({
-        labels: last7Days.map(day => new Date(day).toLocaleDateString()),
-        datasets: [
-          {
-            label: 'Completed Tasks',
-            data: completedTasksByDay,
-            backgroundColor: 'rgba(59, 130, 246, 0.5)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 1,
-          },
-        ],
-      });
-    }
+    console.log('Completed tasks by day:', completedTasksByDay);
+
+    const chartDataConfig = {
+      labels: last7Days.map(day => new Date(day).toLocaleDateString()),
+      datasets: [
+        {
+          label: 'Completed Tasks',
+          data: completedTasksByDay,
+          backgroundColor: 'rgba(59, 130, 246, 0.5)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    console.log('Chart data config:', chartDataConfig);
+    setChartData(chartDataConfig);
   }, [tasks]);
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Productivity Trends (Last 7 Days)',
       },
     },
     scales: {
@@ -93,9 +97,20 @@ const ProductivityChart: React.FC = () => {
     );
   }
 
+  const hasData = chartData.datasets[0].data.some((value: number) => value > 0);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <Bar data={chartData} options={options} />
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Productivity Trends (Last 7 Days)</h3>
+      {hasData ? (
+        <Bar data={chartData} options={options} />
+      ) : (
+        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <div className="text-6xl mb-4">📊</div>
+          <p className="text-lg font-medium">No completed tasks yet</p>
+          <p className="text-sm">Complete some tasks to see your productivity trends</p>
+        </div>
+      )}
     </div>
   );
 };

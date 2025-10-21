@@ -1,7 +1,8 @@
 import express from 'express';
 import Task from '../models/Task';
 import { authenticateToken } from '../middleware/auth';
-import { validate, taskSchema } from '../middleware/validation';
+import { validate, taskSchema, taskUpdateSchema } from '../middleware/validation';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get('/', authenticateToken, async (req, res) => {
     const { status, category, priority, page = 1, limit = 10 } = req.query;
     
     // Build filter object
-    const filter: any = { userId: req.user!.userId };
+    const filter: any = { userId: new mongoose.Types.ObjectId(req.user!.userId) };
     
     if (status) filter.status = status;
     if (category) filter.category = category;
@@ -54,7 +55,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const task = await Task.findOne({ 
       _id: req.params.id, 
-      userId: req.user!.userId 
+      userId: new mongoose.Types.ObjectId(req.user!.userId) 
     });
 
     if (!task) {
@@ -82,7 +83,7 @@ router.post('/', authenticateToken, validate(taskSchema), async (req, res) => {
   try {
     const task = new Task({
       ...req.body,
-      userId: req.user!.userId
+      userId: new mongoose.Types.ObjectId(req.user!.userId)
     });
 
     await task.save();
@@ -102,10 +103,10 @@ router.post('/', authenticateToken, validate(taskSchema), async (req, res) => {
 });
 
 // Update task
-router.put('/:id', authenticateToken, validate(taskSchema), async (req, res) => {
+router.put('/:id', authenticateToken, validate(taskUpdateSchema), async (req, res) => {
   try {
     const task = await Task.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user!.userId },
+      { _id: req.params.id, userId: new mongoose.Types.ObjectId(req.user!.userId) },
       req.body,
       { new: true, runValidators: true }
     );
@@ -136,7 +137,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const task = await Task.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user!.userId
+      userId: new mongoose.Types.ObjectId(req.user!.userId)
     });
 
     if (!task) {
@@ -162,7 +163,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 // Get task statistics
 router.get('/stats/overview', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user!.userId;
+    const userId = new mongoose.Types.ObjectId(req.user!.userId);
 
     const stats = await Task.aggregate([
       { $match: { userId: userId } },

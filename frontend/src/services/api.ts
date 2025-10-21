@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { AuthResponse, ApiResponse, TasksResponse, TaskStats, Task, User } from '../types';
+import { store } from '../store';
+import { logout } from '../store/slices/authSlice';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
@@ -29,7 +31,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      // Dispatch logout action to clear Redux state
+      store.dispatch(logout());
       window.location.href = '/login';
     }
     return Promise.reject(error);

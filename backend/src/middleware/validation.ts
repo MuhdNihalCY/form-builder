@@ -49,6 +49,26 @@ export const taskSchema = Joi.object({
   })
 });
 
+// Schema for updating tasks (all fields optional)
+export const taskUpdateSchema = Joi.object({
+  title: Joi.string().min(1).max(200).optional().messages({
+    'string.min': 'Title cannot be empty',
+    'string.max': 'Title cannot exceed 200 characters'
+  }),
+  description: Joi.string().max(1000).allow('').optional().messages({
+    'string.max': 'Description cannot exceed 1000 characters'
+  }),
+  category: Joi.string().min(1).max(50).optional().messages({
+    'string.min': 'Category cannot be empty',
+    'string.max': 'Category cannot exceed 50 characters'
+  }),
+  priority: Joi.string().valid('low', 'medium', 'high').optional(),
+  status: Joi.string().valid('todo', 'in_progress', 'completed').optional(),
+  dueDate: Joi.date().optional().messages({
+    'date.base': 'Due date must be a valid date'
+  })
+});
+
 // Validation middleware factory
 export const validate = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {

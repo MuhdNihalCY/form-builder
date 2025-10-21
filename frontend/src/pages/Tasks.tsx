@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchTasks, createTask, updateTask, deleteTask } from '../store/slices/taskSlice';
 import TaskCard from '../components/TaskCard';
@@ -16,9 +16,12 @@ const Tasks: React.FC = () => {
     priority: '',
   });
 
+  // Memoize the filters to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => filters, [filters]);
+
   useEffect(() => {
-    dispatch(fetchTasks(filters));
-  }, [dispatch, filters.status, filters.category, filters.priority]);
+    dispatch(fetchTasks(memoizedFilters));
+  }, [dispatch, memoizedFilters]);
 
   const handleCreateTask = async (taskData: any) => {
     try {
@@ -56,12 +59,12 @@ const Tasks: React.FC = () => {
     }
   };
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters(prev => ({
       ...prev,
       [key]: value
     }));
-  };
+  }, []);
 
   if (loading) {
     return (
