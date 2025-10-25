@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchTaskStats, fetchTasks } from '../store/slices/taskSlice';
+import { fetchCategories, initializeDefaultCategories } from '../store/slices/categorySlice';
+import { Category } from '../types';
 import TaskStats from '../components/TaskStats';
 import ProductivityChart from '../components/ProductivityChart';
 import RecentTasks from '../components/RecentTasks';
@@ -8,12 +10,28 @@ import RecentTasks from '../components/RecentTasks';
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { stats, loading, tasks } = useAppSelector((state) => state.tasks);
+  const { categories } = useAppSelector((state) => state.categories);
 
   useEffect(() => {
     // Fetch both stats and tasks for the dashboard
     dispatch(fetchTaskStats());
     dispatch(fetchTasks({ limit: 1000 })); // Get all tasks for charts
-  }, [dispatch]);
+    
+    // Initialize categories if none exist
+    if (categories.length === 0) {
+      dispatch(fetchCategories()).then((result) => {
+        // Check if the fetch was successful but returned empty array
+        if (result.type === 'categories/fetchCategories/fulfilled' && 
+            (result.payload as { categories: Category[] }).categories.length === 0) {
+          // Initialize default categories if none exist
+          dispatch(initializeDefaultCategories());
+        } else if (result.type === 'categories/fetchCategories/rejected') {
+          // If fetch fails, try to initialize default categories
+          dispatch(initializeDefaultCategories());
+        }
+      });
+    }
+  }, [dispatch, categories.length]);
 
   if (loading) {
     return (

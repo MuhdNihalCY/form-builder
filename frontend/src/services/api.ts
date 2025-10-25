@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AuthResponse, ApiResponse, TasksResponse, TaskStats, Task, User } from '../types';
+import { AuthResponse, ApiResponse, TasksResponse, TaskStats, Task, User, Category } from '../types';
 import { store } from '../store';
 import { logout } from '../store/slices/authSlice';
 
@@ -92,6 +92,39 @@ export const tasksAPI = {
 
   getTaskStats: async (): Promise<ApiResponse<{ stats: TaskStats }>> => {
     const response = await api.get('/tasks/stats/overview');
+    return response.data;
+  },
+};
+
+// Categories API
+export const categoriesAPI = {
+  getCategories: async (): Promise<ApiResponse<{ categories: Category[] }>> => {
+    const response = await api.get('/categories');
+    return response.data;
+  },
+
+  getCategory: async (id: string): Promise<ApiResponse<{ category: Category }>> => {
+    const response = await api.get(`/categories/${id}`);
+    return response.data;
+  },
+
+  createCategory: async (categoryData: Partial<Category>): Promise<ApiResponse<{ category: Category }>> => {
+    const response = await api.post('/categories', categoryData);
+    return response.data;
+  },
+
+  updateCategory: async (id: string, categoryData: Partial<Category>): Promise<ApiResponse<{ category: Category }>> => {
+    const response = await api.put(`/categories/${id}`, categoryData);
+    return response.data;
+  },
+
+  deleteCategory: async (id: string): Promise<ApiResponse<null>> => {
+    const response = await api.delete(`/categories/${id}`);
+    return response.data;
+  },
+
+  initializeDefaultCategories: async (): Promise<ApiResponse<{ categories: Category[] }>> => {
+    const response = await api.post('/categories/initialize-defaults');
     return response.data;
   },
 };

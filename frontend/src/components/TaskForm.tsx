@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task } from '../types';
+import CategoryDropdown from './CategoryDropdown';
 
 interface TaskFormProps {
   task?: Task;
@@ -34,6 +35,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleCategoryChange = (categoryName: string) => {
+    setFormData({
+      ...formData,
+      category: categoryName,
     });
   };
 
@@ -92,15 +100,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
               <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                 Category *
               </label>
-              <input
-                type="text"
-                id="category"
-                name="category"
-                required
+              <CategoryDropdown
                 value={formData.category}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter category"
+                onChange={handleCategoryChange}
+                placeholder="Select category"
+                className="mt-1"
               />
             </div>
 

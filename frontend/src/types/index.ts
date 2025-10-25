@@ -5,6 +5,18 @@ export interface User {
   role: 'individual' | 'team_member' | 'team_admin';
 }
 
+export interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+  color: string;
+  userId: string;
+  isDefault: boolean;
+  taskCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Task {
   _id: string;
   title: string;
