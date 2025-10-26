@@ -92,7 +92,8 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload.categories;
+        // The API returns { data: { categories } } so we need to unpack it
+        state.categories = (action.payload as any).categories || [];
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
@@ -106,7 +107,11 @@ const categorySlice = createSlice({
       })
       .addCase(createCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories.push(action.payload.category);
+        // The API returns { data: { category } }
+        const category = (action.payload as any).category;
+        if (category) {
+          state.categories.push(category);
+        }
       })
       .addCase(createCategory.rejected, (state, action) => {
         state.loading = false;
@@ -120,9 +125,12 @@ const categorySlice = createSlice({
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.categories.findIndex(cat => cat._id === action.payload.category._id);
-        if (index !== -1) {
-          state.categories[index] = action.payload.category;
+        const category = (action.payload as any).category;
+        if (category) {
+          const index = state.categories.findIndex(cat => cat._id === category._id);
+          if (index !== -1) {
+            state.categories[index] = category;
+          }
         }
       })
       .addCase(updateCategory.rejected, (state, action) => {
@@ -151,7 +159,13 @@ const categorySlice = createSlice({
       })
       .addCase(initializeDefaultCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload.categories;
+        const categories = (action.payload as any).categories || [];
+        // Add new default categories without duplicating existing ones
+        categories.forEach((newCat: Category) => {
+          if (!state.categories.some(existingCat => existingCat._id === newCat._id)) {
+            state.categories.push(newCat);
+          }
+        });
       })
       .addCase(initializeDefaultCategories.rejected, (state, action) => {
         state.loading = false;

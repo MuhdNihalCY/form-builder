@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
+import Categories from './pages/Categories';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function AppContent() {
@@ -70,6 +71,16 @@ function AppContent() {
             <ProtectedRoute>
               <Layout>
                 <Tasks />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Categories />
               </Layout>
             </ProtectedRoute>
           }

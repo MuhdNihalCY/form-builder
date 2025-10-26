@@ -17,13 +17,62 @@ export interface Category {
   updatedAt: string;
 }
 
+export interface TaskStatus {
+  _id: string;
+  name: string;
+  description?: string;
+  color: string;
+  order: number;
+  isDefault: boolean;
+  isCompleted: boolean;
+  isActive: boolean;
+  userId: string;
+  workflowId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskLevel {
+  _id: string;
+  name: string;
+  description?: string;
+  level: number;
+  color: string;
+  icon?: string;
+  isDefault: boolean;
+  isActive: boolean;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Workflow {
+  _id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  isActive: boolean;
+  userId: string;
+  statuses: Array<{
+    statusId: string;
+    order: number;
+    isRequired: boolean;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Task {
   _id: string;
   title: string;
   description?: string;
   category: string;
   priority: 'low' | 'medium' | 'high';
-  status: 'todo' | 'in_progress' | 'completed';
+  status: string; // Dynamic status name
+  statusId?: string; // Reference to TaskStatus
+  level: number; // Dynamic level number
+  levelId?: string; // Reference to TaskLevel
+  workflowId?: string; // Reference to Workflow
   dueDate?: string;
   userId: string;
   completedAt?: string;

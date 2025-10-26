@@ -8,6 +8,8 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import taskRoutes from './routes/tasks';
 import categoryRoutes from './routes/categories';
+import taskStatusRoutes from './routes/taskStatuses';
+import taskLevelRoutes from './routes/taskLevels';
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +46,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/task-statuses', taskStatusRoutes);
+app.use('/api/task-levels', taskLevelRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

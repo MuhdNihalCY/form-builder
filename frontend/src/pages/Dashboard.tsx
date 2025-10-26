@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchTaskStats, fetchTasks } from '../store/slices/taskSlice';
 import { fetchCategories, initializeDefaultCategories } from '../store/slices/categorySlice';
-import { Category } from '../types';
 import TaskStats from '../components/TaskStats';
 import ProductivityChart from '../components/ProductivityChart';
 import RecentTasks from '../components/RecentTasks';
@@ -21,10 +20,12 @@ const Dashboard: React.FC = () => {
     if (categories.length === 0) {
       dispatch(fetchCategories()).then((result) => {
         // Check if the fetch was successful but returned empty array
-        if (result.type === 'categories/fetchCategories/fulfilled' && 
-            (result.payload as { categories: Category[] }).categories.length === 0) {
-          // Initialize default categories if none exist
-          dispatch(initializeDefaultCategories());
+        if (result.type === 'categories/fetchCategories/fulfilled') {
+          const categories = (result.payload as any).categories || [];
+          if (categories.length === 0) {
+            // Initialize default categories if none exist
+            dispatch(initializeDefaultCategories());
+          }
         } else if (result.type === 'categories/fetchCategories/rejected') {
           // If fetch fails, try to initialize default categories
           dispatch(initializeDefaultCategories());

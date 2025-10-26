@@ -5,7 +5,11 @@ export interface ITask extends Document {
   description?: string;
   category: string;
   priority: 'low' | 'medium' | 'high';
-  status: 'todo' | 'in_progress' | 'completed';
+  status: string; // Dynamic status - references TaskStatus
+  statusId?: mongoose.Types.ObjectId; // Reference to TaskStatus
+  level: number; // Dynamic level - references TaskLevel
+  levelId?: mongoose.Types.ObjectId; // Reference to TaskLevel
+  workflowId?: mongoose.Types.ObjectId; // Reference to Workflow
   dueDate?: Date;
   userId: mongoose.Types.ObjectId;
   completedAt?: Date;
@@ -38,8 +42,28 @@ const taskSchema = new Schema<ITask>({
   },
   status: { 
     type: String, 
-    enum: ['todo', 'in_progress', 'completed'], 
-    default: 'todo' 
+    required: true,
+    trim: true,
+    maxlength: 50
+  },
+  statusId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'TaskStatus' 
+  },
+  level: { 
+    type: Number, 
+    required: true,
+    min: 1,
+    max: 10,
+    default: 5
+  },
+  levelId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'TaskLevel' 
+  },
+  workflowId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'Workflow' 
   },
   dueDate: { 
     type: Date 
@@ -56,10 +80,19 @@ const taskSchema = new Schema<ITask>({
   timestamps: true
 });
 
-// Update completedAt when status changes to completed
-taskSchema.pre('save', function(next) {
-  if (this.isModified('status') && this.status === 'completed' && !this.completedAt) {
-    this.completedAt = new Date();
+// Update completedAt when status changes to a completed status
+taskSchema.pre('save', async function(next) {
+  if (this.isModified('status') && !this.completedAt) {
+    // Check if the current status is marked as completed
+    const TaskStatus = mongoose.model('TaskStatus');
+    const statusDoc = await TaskStatus.findOne({ 
+      userId: this.userId, 
+      name: this.status 
+    });
+    
+    if (statusDoc && statusDoc.isCompleted) {
+      this.completedAt = new Date();
+    }
   }
   next();
 });

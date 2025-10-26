@@ -14,7 +14,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
     description: '',
     category: '',
     priority: 'medium' as 'low' | 'medium' | 'high',
-    status: 'todo' as 'todo' | 'in_progress' | 'completed',
+    status: 'To Do' as string, // Dynamic status
+    level: 5 as number, // Dynamic level
     dueDate: '',
   });
 
@@ -26,6 +27,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
         category: task.category,
         priority: task.priority,
         status: task.status,
+        level: task.level || 5,
         dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       });
     }
@@ -48,10 +50,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const taskData = {
+    const taskData: any = {
       ...formData,
       dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
     };
+    
+    // Convert level to number if it's in formData as string
+    if (typeof taskData.level === 'string') {
+      taskData.level = parseInt(taskData.level);
+    }
 
     onSubmit(taskData);
   };
@@ -108,24 +115,24 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-                  Priority
-                </label>
-                <select
-                  id="priority"
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
+            <div>
+              <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
+                Priority
+              </label>
+              <select
+                id="priority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700">
                   Status
@@ -137,9 +144,30 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
+                  <option value="To Do">To Do</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Review">Review</option>
+                  <option value="Completed">Completed</option>
+                  <option value="On Hold">On Hold</option>
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="level" className="block text-sm font-medium text-gray-700">
+                  Level
+                </label>
+                <select
+                  id="level"
+                  name="level"
+                  value={formData.level}
+                  onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value) })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="1">1 - Critical</option>
+                  <option value="2">2 - High</option>
+                  <option value="3">3 - Medium</option>
+                  <option value="4">4 - Low</option>
+                  <option value="5">5 - Backlog</option>
                 </select>
               </div>
             </div>

@@ -45,6 +45,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   Tasks
                 </Link>
+                <Link
+                  to="/categories"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Categories
+                </Link>
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-700">
                     Welcome, {user?.name}
