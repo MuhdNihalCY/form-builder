@@ -5,12 +5,12 @@ interface RecentTasksProps {
   tasks: Task[];
 }
 
-const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
+const RecentTasks: React.FC<RecentTasksProps> = ({ tasks = [] }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-800';
-      case 'in_progress': return 'bg-blue-100 text-blue-800';
-      case 'todo': return 'bg-gray-100 text-gray-800';
+      case 'In Progress': return 'bg-blue-100 text-blue-800';
+      case 'To Do': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -24,7 +24,8 @@ const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
     }
   };
 
-  const recentTasks = [...tasks]
+  const recentTasks = (tasks || [])
+    .filter(task => task && task.createdAt)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 

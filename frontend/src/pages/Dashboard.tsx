@@ -5,6 +5,7 @@ import { fetchCategories, initializeDefaultCategories } from '../store/slices/ca
 import TaskStats from '../components/TaskStats';
 import ProductivityChart from '../components/ProductivityChart';
 import RecentTasks from '../components/RecentTasks';
+import KanbanBoard from '../components/KanbanBoard';
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,13 +35,17 @@ const Dashboard: React.FC = () => {
     }
   }, [dispatch, categories.length]);
 
-  if (loading) {
+  // Show loading only for initial load, not for subsequent updates
+  if (loading && (!tasks || tasks.length === 0) && !stats) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
   }
+
+  // Ensure tasks array is always defined
+  const safeTasks = tasks || [];
 
   return (
     <div className="space-y-6">
@@ -51,11 +56,13 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
       
+      <KanbanBoard />
+      
       <TaskStats stats={stats} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProductivityChart />
-        <RecentTasks tasks={tasks} />
+        <RecentTasks tasks={safeTasks} />
       </div>
     </div>
   );
